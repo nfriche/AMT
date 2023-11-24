@@ -214,14 +214,19 @@ def load_model(model, path, eval_phase=True, strict=True, to_cpu=False):
 
 class ModelSaver:
     """
-    Convenience functor to save model at specific times, can be used as a
-    parameterless hook e.g. at the end of each SGDR cycle.
+    Convenience functor to save model and training state at specific times.
     """
-    def __init__(self, model, out_folder, log_fn=None):
+    def __init__(self, model, optimizer, training_state, out_folder, log_fn=None):
         """
+        :param model: The model to be saved.
+        :param optimizer: The optimizer whose state needs to be saved.
+        :param training_state: A dictionary containing other training states like current epoch, global step, etc.
+        :param out_folder: Folder where the checkpoint will be saved.
+        :param log_fn: Optional function to log messages.
         """
         self.model = model
-        self.model_name = model.__class__.__name__
+        self.optimizer = optimizer
+        self.training_state = training_state
         self.out_folder = out_folder
         self.log_fn = log_fn
 
@@ -229,15 +234,24 @@ class ModelSaver:
         """
         :param suffix: If given, string added after the output basename.
         """
-        basename = f"{self.model_name}_{make_timestamp(with_tz_output=False)}"
+        basename = f"{self.model.__class__.__name__}_{make_timestamp(with_tz_output=False)}"
         if suffix is not None:
             basename += suffix
-        out_path = os.path.join(self.out_folder, basename + ".torch")
-        save_model(self.model, out_path)
+        out_path = os.path.join(self.out_folder, basename + ".pth")
+
+        checkpoint = {
+            'model_state_dict': self.model.state_dict(),
+            'optimizer_state_dict': self.optimizer.state_dict(),
+            'training_state': self.training_state
+        }
+
+        torch.save(checkpoint, out_path)
+
         if self.log_fn is not None:
-            msg = f"Saved model to {out_path}"
+            msg = f"Saved checkpoint to {out_path}"
             self.log_fn(msg)
         return out_path
+
 
 
 # ##############################################################################
