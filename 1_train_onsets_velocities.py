@@ -114,13 +114,15 @@ class ConfDef:
     RANDOM_SEED: Optional[int] = None
     # I/O
     OUTPUT_DIR: str = "out"
-    MAESTRO_PATH: str = os.path.join("datasets", "maestro", "maestro-v3.0.0")
+    MAESTRO_PATH: str = os.path.join("..", "data", "metadata")
     MAESTRO_VERSION: int = 3
     HDF5_MEL_PATH: str = os.path.join(
-        "datasets",
+        "..",
+        "data",
         "MAESTROv3_logmel_sr=16000_stft=2048w384h_mel=229(50-8000).h5")
     HDF5_ROLL_PATH: str = os.path.join(
-        "datasets",
+        "..",
+        "data",
         "MAESTROv3_roll_quant=0.024_midivals=128_extendsus=True.h5")
     SNAPSHOT_INPATH: Optional[str] = None
     # data loader
@@ -361,6 +363,7 @@ if __name__ == "__main__":
     global_step = 1
     onsets_beg, onsets_end = maestro_train.ONSETS_RANGE
     frames_beg, frames_end = maestro_train.FRAMES_RANGE
+    training_losses = []
     for epoch in range(1, CONF.NUM_EPOCHS + 1):
         for i, (logmels, rolls, metas) in enumerate(train_dl):
             # ##################################################################
@@ -382,6 +385,11 @@ if __name__ == "__main__":
                             mel, md, CONF.XV_THRESHOLDS)
                         xv_results.append(xv_result)
                         xv_results_vel.append(xv_result_vel)
+                # add loss to list        
+                if CONF.TRAINABLE_ONSETS:
+                    training_losses.append((epoch, global_step, vel_loss.item(), ons_loss.item()))
+                else:
+                    training_losses.append((epoch, global_step, vel_loss.item()))
                 # compare non-vel results and report best
                 xv_dfs = [(t, pd.DataFrame(
                     x, columns=["filename", "P", "R", "F1"]))
@@ -488,3 +496,8 @@ if __name__ == "__main__":
                                 "LR": opt.get_lr()})
                 #
             global_step += 1
+
+    # Save the training losses to a CSV file
+    loss_columns = ['Epoch', 'Step', 'Velocity_Loss', 'Onset_Loss'] if CONF.TRAINABLE_ONSETS else ['Epoch', 'Step', 'Velocity_Loss']
+    df_losses = pd.DataFrame(training_losses, columns=loss_columns)
+    df_losses.to_csv('training_losses.csv', index=False)
