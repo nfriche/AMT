@@ -114,14 +114,12 @@ class ConfDef:
     RANDOM_SEED: Optional[int] = None
     # I/O
     OUTPUT_DIR: str = "out"
-    MAESTRO_PATH: str = os.path.join("..", "data", "metadata")
+    MAESTRO_PATH: str = os.path.join("data", "metadata")
     MAESTRO_VERSION: int = 3
     HDF5_MEL_PATH: str = os.path.join(
-        "..",
         "data",
         "MAESTROv3_logmel_sr=16000_stft=2048w384h_mel=229(50-8000).h5")
     HDF5_ROLL_PATH: str = os.path.join(
-        "..",
         "data",
         "MAESTROv3_roll_quant=0.024_midivals=128_extendsus=True.h5")
     SNAPSHOT_INPATH: Optional[str] = None
