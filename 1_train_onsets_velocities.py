@@ -118,7 +118,7 @@ class ConfDef:
     MAESTRO_VERSION: int = 3
     HDF5_MEL_PATH: str = os.path.join(
         "data",
-        "MAESTROv3_logmel_sr=16000_stft=2048w384h_mel=229(50-8000).h5")
+        "MAESTROv3_logmel_sr=16000_stft=2048w384h_mel=229(50-8000)-001.h5")
     HDF5_ROLL_PATH: str = os.path.join(
         "data",
         "MAESTROv3_roll_quant=0.024_midivals=128_extendsus=True.h5")
