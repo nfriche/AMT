@@ -245,7 +245,7 @@ if __name__ == "__main__":
     if CONF.SNAPSHOT_INPATH is not None:
         load_model(model, CONF.SNAPSHOT_INPATH, eval_phase=False)
     model_saver = ModelSaver(
-        model, MODEL_SNAPSHOT_OUTDIR,
+        model=model, optimizer=opt, out_folder=MODEL_SNAPSHOT_OUTDIR,
         log_fn=lambda msg: txt_logger.loj("SAVED_MODEL", msg))
 
     # decoder
