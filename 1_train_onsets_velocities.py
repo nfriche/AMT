@@ -266,7 +266,7 @@ if __name__ == "__main__":
     opt_hpars = {
         "lr_max": CONF.LR_MAX, "lr": CONF.LR_MAX,
         "lr_period": CONF.LR_PERIOD, "lr_decay": CONF.LR_DECAY,
-        "lr_slowdown": CONF.LR_SLOWDOWN, "cycle_end_hook_fn": model_saver,
+        "lr_slowdown": CONF.LR_SLOWDOWN,
         "cycle_warmup": CONF.LR_WARMUP, "weight_decay": CONF.WEIGHT_DECAY,
         "betas": (0.9, 0.999), "eps": 1e-8, "amsgrad": False}
     opt = AdamWR(trainable_params, **opt_hpars)
@@ -275,6 +275,7 @@ if __name__ == "__main__":
     model_saver = ModelSaver(
         model, opt, MODEL_SNAPSHOT_OUTDIR,
         log_fn=lambda msg: txt_logger.loj("SAVED_MODEL", msg))
+    opt.cycle_end_hook_fn = model_saver
 
     # ##########################################################################
     # # XV HELPERS
