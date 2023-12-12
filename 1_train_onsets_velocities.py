@@ -122,8 +122,8 @@ class ConfDef:
     HDF5_ROLL_PATH: str = os.path.join(
         "data",
         "MAESTROv3_roll_quant=0.024_midivals=128_extendsus=True.h5")
-    SNAPSHOT_INPATH = "out/model_snapshots/OnsetsAndVelocities_2023_12_11_20_20_10.595.torch"
-    #SNAPSHOT_INPATH: Optional[str] = None
+    #SNAPSHOT_INPATH: Optional[str] = "out/model_snapshots/OnsetsAndVelocities_2023_12_11_20_20_10.595.torch"
+    SNAPSHOT_INPATH: Optional[str] = None
     # data loader
     TRAIN_BS: int = 40
     TRAIN_BATCH_SECS: float = 5.0
