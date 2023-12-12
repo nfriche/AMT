@@ -245,9 +245,6 @@ if __name__ == "__main__":
         dropout_drop_p=CONF.DROPOUT).to(CONF.DEVICE)
     if CONF.SNAPSHOT_INPATH is not None:
         load_model(model, CONF.SNAPSHOT_INPATH, eval_phase=False)
-    model_saver = ModelSaver(
-        model, MODEL_SNAPSHOT_OUTDIR,
-        log_fn=lambda msg: txt_logger.loj("SAVED_MODEL", msg))
 
     # decoder
     decoder = OnsetVelocityNmsDecoder(
@@ -273,6 +270,11 @@ if __name__ == "__main__":
         "cycle_warmup": CONF.LR_WARMUP, "weight_decay": CONF.WEIGHT_DECAY,
         "betas": (0.9, 0.999), "eps": 1e-8, "amsgrad": False}
     opt = AdamWR(trainable_params, **opt_hpars)
+
+    # model saver
+    model_saver = ModelSaver(
+        model, opt, MODEL_SNAPSHOT_OUTDIR,
+        log_fn=lambda msg: txt_logger.loj("SAVED_MODEL", msg))
 
     # ##########################################################################
     # # XV HELPERS
@@ -427,8 +429,8 @@ if __name__ == "__main__":
                     "best_f1_v_thresh": CONF.XV_THRESHOLDS[
                         int(best_f1_idx_vel)],
                     "best_f1_v": best_f1_vel})
-                model_saver(
-                    f"step={global_step}_f1={best_f1:.4f}__{best_f1_vel:.4f}")
+                suffix = f"_step={global_step}_f1={best_f1:.4f}__{best_f1_vel:.4f}"
+                model_saver(epoch, suffix)
                 #
                 torch.cuda.empty_cache()
                 model.train()
