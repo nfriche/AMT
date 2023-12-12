@@ -220,19 +220,22 @@ class ModelSaver:
     def __init__(self, model, optimizer, out_folder, log_fn=None):
         self.model = model
         self.optimizer = optimizer
-        self.model_name = model.__class__.__name__
         self.out_folder = out_folder
         self.log_fn = log_fn
+        self.epoch = 0  # Initialize an internal epoch counter
 
-    def __call__(self, epoch, suffix=None):
-        basename = f"{self.model_name}_{make_timestamp(with_tz_output=False)}"
-        if suffix is not None:
-            basename += suffix
+    def __call__(self, epoch=None, suffix=None):
+        if epoch is not None:
+            self.epoch = epoch
+        else:
+            self.epoch += 1  # Increment internal epoch counter if not provided
+        basename = f"{self.model.__class__.__name__}_{make_timestamp(with_tz_output=False)}"
+        if suffix:
+            basename += f"_{suffix}"
         out_path = os.path.join(self.out_folder, basename + ".torch")
-        save_model(self.model, self.optimizer, epoch, out_path)
-        if self.log_fn is not None:
-            msg = f"Saved model to {out_path}"
-            self.log_fn(msg)
+        save_model(self.model, self.optimizer, self.epoch, out_path)
+        if self.log_fn:
+            self.log_fn(f"Saved model to {out_path}")
         return out_path
 
 
