@@ -17,21 +17,20 @@ from .maps import MelMaps, MelMapsChunks
 # ##############################################################################
 # #  META (paths etc)
 # ##############################################################################
-class MetaMAESTROv3:
+class PuDoMS:
     """
-    This class parses the filesystem tree for the MAESTRO dataset and, based on
+    This class parses the filesystem tree for the PuDoMS dataset and, based on
     the given filters, stores a list of file paths.
 
-    It can be used to manage MAESTRO files and to create custom dataloaders.
+    It can be used to manage PuDoMS files and to create custom dataloaders.
     """
 
-    CSV_NAME = "maestro-v3.0.0.csv"
+    CSV_NAME = "pudoms.csv"
     ALL_SPLITS = {"train", "validation", "test"}
-    ALL_YEARS = {2004, 2006, 2008, 2009, 2011, 2013, 2014, 2015, 2017, 2018}
     AUDIO_EXT = ".wav"
     MIDI_EXT = ".midi"
 
-    def __init__(self, rootpath, splits=None, years=None):
+    def __init__(self, rootpath, splits=None):
         """
         """
         self.rootpath = rootpath
@@ -39,23 +38,18 @@ class MetaMAESTROv3:
         # filter sanity check
         if splits is None:
             splits = self.ALL_SPLITS
-        if years is None:
-            years = self.ALL_YEARS
         assert (s in self.ALL_SPLITS for s in splits), \
             f"Unknown split in {splits}"
-        assert (y in self.ALL_YEARS for y in years), f"Unknown year in {years}"
         # load and filter csv
         df = pd.read_csv(self.meta_path)
-        df = df[df["split"].isin(splits)]
-        df = df[df["year"].isin(years)]
+        df = df[df["Split"].isin(splits)]
         # reformat into DATA_COLUMNS + metadata_str and gather
-        columns = ["audio_filename", "year", "split", "duration",
-                   "canonical_composer", "canonical_title"]
+        columns = ["File_Number", "Split", "Duration",
+                   "Composer", "Title"]
         self.data = []
-        for i, (path, y, s, dur, comp, title) in df[columns].iterrows():
-            basepath = os.path.splitext(path)[0]
-            meta = (y, s, dur, comp, title)
-            self.data.append((basepath, meta))
+        for i, (id, s, dur, comp, title) in df[columns].iterrows():
+            meta = (id, s, dur, comp, title)
+            self.data.append(meta)
         self.full_data = df
 
     def get_file_abspath(self, basename):
@@ -69,24 +63,6 @@ class MetaMAESTROv3:
         assert len(matches) == 1, "Expected exactly 1 match!"
         path = os.path.join(self.rootpath, matches[0])
         return path
-
-
-class MetaMAESTROv1(MetaMAESTROv3):
-    """
-    Identical to parent class, except for ``CSV_NAME`` pointing to a different
-    CSV file, and ``ALL_YEARS`` containing different years.
-    """
-    CSV_NAME = "maestro-v1.0.0.csv"
-    ALL_YEARS = {2004, 2006, 2008, 2009, 2011, 2013, 2014, 2015, 2017}
-
-
-class MetaMAESTROv2(MetaMAESTROv3):
-    """
-    Identical to parent class, except for ``CSV_NAME`` pointing to a different
-    CSV file, and ``ALL_YEARS`` containing different years.
-    """
-    CSV_NAME = "maestro-v2.0.0.csv"
-    ALL_YEARS = {2004, 2006, 2008, 2009, 2011, 2013, 2014, 2015, 2017}
 
 
 # ##############################################################################
