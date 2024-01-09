@@ -47,10 +47,9 @@ class PuDoMS:
         columns = ["File_Number", "Split", "Duration",
                    "Composer", "Title"]
         self.data = []
-        for i, (path, s, dur, comp, title) in df[columns].iterrows():
-            basepath = os.path.splitext(path)[0]
-            meta = (s, dur, comp, title)
-            self.data.append((basepath,meta))
+        for i, (id, s, dur, comp, title) in df[columns].iterrows():
+            meta = (s, dur, comp, title)  
+            self.data.append((str(id), meta))
         self.full_data = df
 
     def get_file_abspath(self, basename):
