@@ -36,7 +36,7 @@ class SingletrackMidiParser:
     DEFAULT_MIDI_TEMPO = 500_000  # MIDI standard
     # https://cmtext.indiana.edu/MIDI/chapter3_controller_change2.php
     CONTROL_CODES = {64: "sustain_pedal", 66: "sostenuto_pedal",
-                     67: "soft_pedal"}
+                     67: "soft_pedal", 121: "reset_all_controllers"}
 
     @classmethod
     def load_midi(cls, midi_path):
@@ -62,7 +62,7 @@ class SingletrackMidiParser:
         if msg.type in ("note_on", "note_off"):
             return (msg.type, (msg.note, msg.velocity), msg.channel)
         elif msg.type == "control_change":
-            msg_name = cls.CONTROL_CODES[msg.control]
+            msg_name = cls.CONTROL_CODES.get(msg.control, "unknown_control")
             return (msg_name, msg.value, msg.channel)
         else:
             raise RuntimeError(f"Unhandled message! {msg}")
