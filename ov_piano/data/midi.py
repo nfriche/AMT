@@ -64,6 +64,8 @@ class SingletrackMidiParser:
         elif msg.type == "control_change":
             msg_name = cls.CONTROL_CODES.get(msg.control, "unknown_control")
             return (msg_name, msg.value, msg.channel)
+        elif msg.type == "program_change":
+            return (msg.type, msg.program, msg.channel)
         else:
             raise RuntimeError(f"Unhandled message! {msg}")
 
