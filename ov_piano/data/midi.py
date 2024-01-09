@@ -102,6 +102,8 @@ class SingletrackMidiParser:
                     tempo = msg.tempo
                 elif msg.type == "time_signature":
                     pass
+                elif msg.type == "key_signature":
+                    pass
                 elif msg.type == "end_of_track":
                     pass
                 else:
