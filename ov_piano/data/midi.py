@@ -217,6 +217,40 @@ class SingletrackMidiParser:
         # return key events and pedal sequences
         return key_events, sus_states, ten_states, soft_states, largest_ts
 
+class GeneralMidiParser(SingletrackMidiParser):
+    """
+    An extension of SingleTrackMidiParser, modified to handle a wider variety
+    of MIDI files.
+    """
+    @staticmethod
+    def process_midi_tracks(mid):
+        """
+        Process MIDI tracks in a more general way, suitable for various types of MIDI files.
+        """
+        combined_messages = []
+        for track in mid.tracks:
+            for message in track:
+                if message.type not in ['track_name', 'end_of_track']:
+                    combined_messages.append(message)
+        # Create a new track with combined messages
+        new_track = mido.MidiTrack(combined_messages)
+        # Replace existing tracks with the new single track
+        mid.tracks = [new_track]
+        mid.type = SingletrackMidiParser.SINGLETRACK_MIDI_CODE
+
+    @classmethod
+    def load_midi(cls, midi_path):
+        """
+        Modified to handle a wider variety of MIDI files.
+        """
+        mid = mido.MidiFile(midi_path)
+        try:
+            cls.process_midi_tracks(mid)  # General processing
+        except Exception as e:
+            print(f"Error processing MIDI file {midi_path}: {e}")
+            return None
+        assert mid.type == cls.SINGLETRACK_MIDI_CODE, "Post-processing error: MIDI file is not single-track."
+        return mid
 
 class MaestroMidiParser(SingletrackMidiParser):
     """
