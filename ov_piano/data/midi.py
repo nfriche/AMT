@@ -106,6 +106,8 @@ class SingletrackMidiParser:
                     pass
                 elif msg.type == "key_signature":
                     pass
+                elif msg.type == "midi_port":
+                    pass
                 elif msg.type == "end_of_track":
                     pass
                 else:
