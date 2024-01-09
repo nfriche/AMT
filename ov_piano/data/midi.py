@@ -100,6 +100,8 @@ class SingletrackMidiParser:
                 meta_messages.append((seconds_counter, msg))
                 if msg.type == "set_tempo":
                     tempo = msg.tempo
+                elif msg.type == "time_signature":
+                    pass
                 elif msg.type == "end_of_track":
                     pass
                 else:
