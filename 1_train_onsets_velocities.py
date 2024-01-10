@@ -356,7 +356,35 @@ if __name__ == "__main__":
                     "XV_ONSET_VEL",
                     {"threshold": t, "P": prec, "R": rec, "F1": f1})
         #
-        return results, results_vel
+        octave_results = []
+        for t in thresholds:
+            df_pred_t = df_pred[df_pred["prob"] >= t]
+    
+            # Group by octave
+            df_gt_octave = df_gt.copy()
+            df_gt_octave['octave'] = map_notes_to_octaves(df_gt_octave['key'].to_numpy())
+            df_pred_t_octave = df_pred_t.copy()
+            df_pred_t_octave['octave'] = map_notes_to_octaves(df_pred_t_octave['key'].to_numpy())
+    
+            for octave in range(min_octave, max_octave + 1):
+                gt_octave = df_gt_octave[df_gt_octave['octave'] == octave]
+                pred_octave = df_pred_t_octave[df_pred_t_octave['octave'] == octave]
+    
+                # Compute metrics
+                prec, rec, f1 = eval_note_events(
+                    gt_octave['onset'].to_numpy(),
+                    gt_octave['key'].to_numpy(),
+                    pred_octave['t_idx'].to_numpy(),
+                    pred_octave['key'].to_numpy(),
+                    # ... other parameters ...
+                )
+                octave_results.append((md[0], octave, t, prec, rec, f1))
+                if verbose:
+                    txt_logger.loj(
+                        "XV_OCTAVE",
+                        {"octave": octave, "threshold": t, "P": prec, "R": rec, "F1": f1})
+                
+        return results, results_vel, octave_results
 
     # ##########################################################################
     # # TRAINING LOOP
@@ -366,6 +394,9 @@ if __name__ == "__main__":
     onsets_beg, onsets_end = maestro_train.ONSETS_RANGE
     frames_beg, frames_end = maestro_train.FRAMES_RANGE
     training_losses = []
+    xv_results = []
+    xv_results_vel = []
+    octave_results = []
     for epoch in range(1, CONF.NUM_EPOCHS + 1):
         for i, (logmels, rolls, metas) in enumerate(train_dl):
             # ##################################################################
@@ -376,17 +407,15 @@ if __name__ == "__main__":
                 #
                 torch.cuda.empty_cache()
                 with torch.no_grad():
-                    xv_results = []
-                    xv_results_vel = []
                     len_xv = len(maestro_xv)
                     for ii, (mel, roll, md) in enumerate(maestro_xv, 1):
                         txt_logger.loj(
                             "XV_PROCESSING",
                             {"idx": ii, "len_xv": len_xv, "filename": md[0]})
-                        xv_result, xv_result_vel = xv_file(
-                            mel, md, CONF.XV_THRESHOLDS)
-                        xv_results.append(xv_result)
-                        xv_results_vel.append(xv_result_vel)
+                        xv_result, xv_result_vel, octave_result = xv_file(mel, md, CONF.XV_THRESHOLDS)
+                        xv_results_list.extend(xv_result)
+                        xv_results_vel_list.extend(xv_result_vel)
+                        octave_results_list.extend(octave_result)
                 # add loss to list        
                 if CONF.TRAINABLE_ONSETS:
                     training_losses.append((epoch, global_step, vel_loss.item(), ons_loss.item()))
@@ -499,7 +528,24 @@ if __name__ == "__main__":
                 #
             global_step += 1
 
+    results_folder = "results"
+    os.makedirs(results_folder, exist_ok=True)
+    
     # Save the training losses to a CSV file
     loss_columns = ['Epoch', 'Step', 'Velocity_Loss', 'Onset_Loss'] if CONF.TRAINABLE_ONSETS else ['Epoch', 'Step', 'Velocity_Loss']
     df_losses = pd.DataFrame(training_losses, columns=loss_columns)
-    df_losses.to_csv('training_losses.csv', index=False)
+    df_losses.to_csv(os.path.join(results_folder, 'training_losses.csv'), index=False)
+
+    # For xv_results_list
+    df_xv_results = pd.DataFrame(xv_results_list, columns=['Filename', 'Precision', 'Recall', 'F1'])
+    df_xv_results.to_csv(os.path.join(results_folder, 'xv_results.csv'), index=False)
+    
+    # For xv_results_vel_list
+    df_xv_results_vel = pd.DataFrame(xv_results_vel_list, columns=['Filename', 'Precision', 'Recall', 'F1'])
+    df_xv_results_vel.to_csv(os.path.join(results_folder, 'xv_results_vel.csv'), index=False)
+
+    # For octave_results_list
+    df_octave_results = pd.DataFrame(octave_results_list, columns=['Filename', 'Octave', 'Threshold', 'Precision', 'Recall', 'F1'])
+    df_octave_results.to_csv(os.path.join(results_folder, 'octave_results.csv'), index=False)
+
+
