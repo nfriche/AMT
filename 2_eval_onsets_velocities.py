@@ -313,3 +313,9 @@ if __name__ == "__main__":
         "ONSETS:\n" + str(test_results_df))
     txt_logger.warning(
         "ONSETS+VELOCITIES:\n" + str(test_results_df_vel))
+
+    results_folder = "results"
+    os.makedirs(results_folder, exist_ok=True)
+    
+    test_results_df.to_csv(os.path.join(results_folder, 'test_results.csv'), index=False)
+    test_results_df_vel.to_csv(os.path.join(results_folder, 'test_results_vel.csv'), index=False)
