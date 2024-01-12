@@ -97,17 +97,19 @@ class ConfDef:
       as it is large enough to avoid boundary artifacts.
     """
     DEVICE: str = "cuda" if torch.cuda.is_available() else "cpu"
-    MAESTRO_PATH: str = os.path.join("datasets", "maestro", "maestro-v3.0.0")
+    MAESTRO_PATH: str = os.path.join("data", "maestro", "maestro-v3.0.0")
     MAESTRO_VERSION: int = 3
     OUTPUT_DIR: str = "out"
     #
     HDF5_MEL_PATH: str = os.path.join(
-        "datasets",
+        "data",
         "MAESTROv3_logmel_sr=16000_stft=2048w384h_mel=229(50-8000).h5")
     HDF5_ROLL_PATH: str = os.path.join(
-        "datasets",
+        "data",
         "MAESTROv3_roll_quant=0.024_midivals=128_extendsus=True.h5")
-    SNAPSHOT_INPATH: str = MISSING
+    SNAPSHOT_INPATH: str = os.path.join("out",
+                                        "model_snapshots",
+                                        "OnsetsAndVelocities_2024_01_09_22_29_02.308__step=143000_f1=0.9663__0.9492.torch")
     #
     CONV1X1: List[int] = (200, 200)
     LEAKY_RELU_SLOPE: Optional[float] = 0.1
