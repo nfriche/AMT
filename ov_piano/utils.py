@@ -204,15 +204,23 @@ def save_model(model, optimizer, epoch, path):
     torch.save(state, path)
 
 
-def load_model(model, path, eval_phase=True, strict=True, to_cpu=False):
+def load_model(model, path, optimizer=None, eval_phase=True, strict=True, to_cpu=False):
     """
+    Loads the model (and optionally the optimizer) from a given path.
     """
-    state_dict = torch.load(path, map_location="cpu" if to_cpu else None)
-    model.load_state_dict(state_dict, strict=strict)
+    checkpoint = torch.load(path, map_location="cpu" if to_cpu else None)
+    # Load the model state_dict
+    model.load_state_dict(checkpoint['state_dict'], strict=strict)
+    # If an optimizer is provided, load its state_dict
+    if optimizer is not None and 'optimizer' in checkpoint:
+        optimizer.load_state_dict(checkpoint['optimizer'])
+    # Retrieve the epoch number if it's in the checkpoint
+    epoch = checkpoint.get('epoch', None)
     if eval_phase:
         model.eval()
     else:
         model.train()
+    return epoch
 
 
 class ModelSaver:
