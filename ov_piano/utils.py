@@ -204,16 +204,15 @@ def save_model(model, optimizer, epoch, path):
     torch.save(state, path)
 
 
-def load_model(model, optimizer, path, eval_phase=True, strict=True, to_cpu=False):
-    checkpoint = torch.load(path, map_location="cpu" if to_cpu else None)
-    model.load_state_dict(checkpoint['state_dict'], strict=strict)
-    optimizer.load_state_dict(checkpoint['optimizer'])
-    start_epoch = checkpoint['epoch']
+def load_model(model, path, eval_phase=True, strict=True, to_cpu=False):
+    """
+    """
+    state_dict = torch.load(path, map_location="cpu" if to_cpu else None)
+    model.load_state_dict(state_dict, strict=strict)
     if eval_phase:
         model.eval()
     else:
         model.train()
-    return start_epoch
 
 
 class ModelSaver:
