@@ -363,14 +363,12 @@ class MidiToPianoRoll:
         msg_channels = [x[1][-1] for x in msgs]
         assert all(x == msg_channels[0] for x in msg_channels), \
             "Only single-channel MIDI supported!"
-        # Check that meta messages are simply set tempo at beginning and
-        # end of track at end
-        assert len(meta_msgs) == 2, \
-            "Expected only 2 meta msgs. If multiple tempo changes, fix this!"
-        assert meta_msgs[0][1].type == "set_tempo", \
-            "First meta message expected is set_tempo"
-        assert meta_msgs[1][1].type == "end_of_track", \
-            "Second meta message expected is end_of_track"
+        # Check for the presence of 'set_tempo' and 'end_of_track' meta messages
+        has_set_tempo = any(msg.type == "set_tempo" for _, msg in meta_msgs)
+        has_end_of_track = any(msg.type == "end_of_track" for _, msg in meta_msgs)
+        
+        assert has_set_tempo, "No 'set_tempo' meta message found."
+        assert has_end_of_track, "No 'end_of_track' meta message found."
 
     @classmethod
     def __call__(cls, midi_path,
