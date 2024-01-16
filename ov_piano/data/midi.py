@@ -141,6 +141,7 @@ class SingletrackMidiParser:
         msgs_ts = [ts for ts, _ in msgs]
         assert msgs_ts == sorted(msgs_ts), "msgs expected to be sorted by ts!"
         for ts, m in msgs:
+            offs = None
             m_type = m[0]
             if m_type == "sustain_pedal":
                 offs = ksm.update_sus(m[1], ts)
