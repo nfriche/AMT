@@ -167,6 +167,8 @@ class SingletrackMidiParser:
             # Can pass program change because files have already been filtered to piano only 
             elif m_type == "program_change":
                 pass
+            elif m_type == "unknown_control":
+                pass
             else:
                 raise RuntimeError(f"Unhandled MIDI event! {(ts, m)}")
             #
