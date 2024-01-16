@@ -164,6 +164,9 @@ class SingletrackMidiParser:
             # Add handling or ignoring of reset_all_controllers message
             elif m_type == "reset_all_controllers":
                 pass
+            # Can pass program change because files have already been filtered to piano only 
+            elif m_type == "program_change":
+                pass
             else:
                 raise RuntimeError(f"Unhandled MIDI event! {(ts, m)}")
             #
