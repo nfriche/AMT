@@ -160,6 +160,9 @@ class SingletrackMidiParser:
                   ((m_type == "note_on") and (m[1][1] == 0))):
                 key, vel = m[1]
                 offs = ksm.key_lifted(key, timestamp=ts)
+            # Add handling or ignoring of reset_all_controllers message
+            elif m_type == "reset_all_controllers":
+                pass
             else:
                 raise RuntimeError(f"Unhandled MIDI event! {(ts, m)}")
             #
