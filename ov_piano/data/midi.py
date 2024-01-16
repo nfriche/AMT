@@ -232,11 +232,6 @@ class GeneralMidiParser(SingletrackMidiParser):
     An extension of SingleTrackMidiParser, modified to handle a wider variety
     of MIDI files.
     """
-    class GeneralMidiParser(SingletrackMidiParser):
-    """
-    An extension of SingleTrackMidiParser, modified to handle a wider variety
-    of MIDI files by merging multiple tracks into a single track.
-    """
     @staticmethod
     def merge_tracks_to_singletrack(mid):
         if mid.type != 1:
