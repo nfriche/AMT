@@ -110,6 +110,8 @@ class SingletrackMidiParser:
                     pass
                 elif msg.type == "end_of_track":
                     pass
+                elif msg.type == "unknown_meta":
+                    pass
                 else:
                     raise RuntimeError(
                         f"Unhandled MIDI meta-message?: {msg.type}")
