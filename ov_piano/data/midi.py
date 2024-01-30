@@ -465,26 +465,18 @@ class MidiToPianoRoll:
             frame_ts, key_events["onset"], side="right") - 1
         end_idxs = np.searchsorted(
             frame_ts, key_events["offset"], side="right") - 1
-        for beg, end, key, vel in zip(
-                beg_idxs, end_idxs, key_events["key"], key_events["vel"]):
-            if onset_roll[key, beg] != 0:
-                # Handle simultaneous onset. You can either:
-                # - Skip this event
-                # - Replace the existing one if this one has a higher velocity
-                if vel > onset_roll[key, beg]:
-                    onset_roll[key, beg] = vel
-                    frame_roll[key, beg:end] = vel  # Update frame_roll as well
-                else:
-                    print("Skipping simultaneous onset:", (beg, end, key, vel))
+        last_onset_frame = [-1] * cls.NUM_MIDI_VALUES  # Track the last onset frame for each key
+
+        for beg, end, key, vel in zip(beg_idxs, end_idxs, key_events["key"], key_events["vel"]):
+            # Skip if this onset is in the same frame as the last onset for this key
+            if beg == last_onset_frame[key]:
+                print(f"Skipping simultaneous onset for key {key} at frame {beg}")
                 continue
         
-            # Check for collision at the end index
-            if offset_roll[key, end] != 0:
-                # Handle the case where the end index is already occupied
-                print("Warning: Offset collision. Consider adjusting quantization:", (beg, end, key, vel))
-                # You can decide how to handle this. Skipping, or adjusting the offset
-                continue
+            # Update last onset frame for this key
+            last_onset_frame[key] = beg
         
+            # Write the onset and offset to the roll
             onset_roll[key, beg] = vel
             offset_roll[key, end] = vel
             frame_roll[key, beg:end] = vel
