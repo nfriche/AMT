@@ -467,14 +467,24 @@ class MidiToPianoRoll:
             frame_ts, key_events["offset"], side="right") - 1
         for beg, end, key, vel in zip(
                 beg_idxs, end_idxs, key_events["key"], key_events["vel"]):
-            is_collision = ((onset_roll[key, beg] != 0) or
-                            (offset_roll[key, end] != 0))
-            if is_collision:
-                print("WARNING: onset/offset collision. To avoid this,",
-                      "increase time-quant resolution:", (beg, end, key, vel))
-            if is_collision:
-                print("WARNING: beg==end, note ignored. To avoid this,",
-                      "increase time-quant resolution:", (beg, end, key, vel))
+            if onset_roll[key, beg] != 0:
+                # Handle simultaneous onset. You can either:
+                # - Skip this event
+                # - Replace the existing one if this one has a higher velocity
+                if vel > onset_roll[key, beg]:
+                    onset_roll[key, beg] = vel
+                    frame_roll[key, beg:end] = vel  # Update frame_roll as well
+                else:
+                    print("Skipping simultaneous onset:", (beg, end, key, vel))
+                continue
+        
+            # Check for collision at the end index
+            if offset_roll[key, end] != 0:
+                # Handle the case where the end index is already occupied
+                print("Warning: Offset collision. Consider adjusting quantization:", (beg, end, key, vel))
+                # You can decide how to handle this. Skipping, or adjusting the offset
+                continue
+        
             onset_roll[key, beg] = vel
             offset_roll[key, end] = vel
             frame_roll[key, beg:end] = vel
