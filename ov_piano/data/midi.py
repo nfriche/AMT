@@ -112,6 +112,8 @@ class SingletrackMidiParser:
                     pass
                 elif msg.type == "unknown_meta":
                     pass
+                elif msg.type == "device_name":
+                    pass
                 else:
                     raise RuntimeError(
                         f"Unhandled MIDI meta-message?: {msg.type}")
