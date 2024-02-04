@@ -380,7 +380,7 @@ class MidiToPianoRoll:
         has_set_tempo = any(msg.type == "set_tempo" for _, msg in meta_msgs)
         has_end_of_track = any(msg.type == "end_of_track" for _, msg in meta_msgs)
         
-        assert has_set_tempo, "No 'set_tempo' meta message found."
+        #assert has_set_tempo, "No 'set_tempo' meta message found."
         assert has_end_of_track, "No 'end_of_track' meta message found."
 
     @classmethod
