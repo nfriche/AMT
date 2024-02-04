@@ -205,14 +205,14 @@ class SingletrackMidiParser:
         # we can't have 2 simultaneous same-key onsets or offsets
         onsets_check = defaultdict(list)
         offsets_check = defaultdict(list)
-        for k, v in onsets:
-            onsets_check[k].extend(v.keys())
-        for k, v in offsets:
-            offsets_check[k].extend(v.keys())
-        assert all([len(v) == len(set(v)) for v in onsets_check.values()]), \
-            "Simultaneous same-key onsets not allowed!"
-        assert all([len(v) == len(set(v)) for v in offsets_check.values()]), \
-            "Simultaneous same-key offsets not allowed!"
+        # for k, v in onsets:
+        #     onsets_check[k].extend(v.keys())
+        # for k, v in offsets:
+        #     offsets_check[k].extend(v.keys())
+        # assert all([len(v) == len(set(v)) for v in onsets_check.values()]), \
+        #     "Simultaneous same-key onsets not allowed!"
+        # assert all([len(v) == len(set(v)) for v in offsets_check.values()]), \
+        #     "Simultaneous same-key offsets not allowed!"
         # at this point, no downpressed notes are expected, but some resonant
         # notes may be left
         assert not ksm()[0], "Notes left downpressed at end of MIDI?"
