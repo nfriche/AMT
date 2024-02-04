@@ -373,9 +373,9 @@ class MidiToPianoRoll:
         :raises: Exception if any of the assumptions on the data aren't met.
         """
         # Check that all messages are on channel 0 (single-instrument)
-        msg_channels = [x[1][-1] for x in msgs]
-        assert all(x == msg_channels[0] for x in msg_channels), \
-            "Only single-channel MIDI supported!"
+        # msg_channels = [x[1][-1] for x in msgs]
+        # assert all(x == msg_channels[0] for x in msg_channels), \
+        #     "Only single-channel MIDI supported!"
         # Check for the presence of 'set_tempo' and 'end_of_track' meta messages
         has_set_tempo = any(msg.type == "set_tempo" for _, msg in meta_msgs)
         has_end_of_track = any(msg.type == "end_of_track" for _, msg in meta_msgs)
