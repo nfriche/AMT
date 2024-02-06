@@ -17,7 +17,7 @@ from .maps import MelMaps, MelMapsChunks
 # ##############################################################################
 # #  META (paths etc)
 # ##############################################################################
-class PuDoMS:
+class MONO_pudoms:
     """
     This class parses the filesystem tree for the PuDoMS dataset and, based on
     the given filters, stores a list of file paths.
