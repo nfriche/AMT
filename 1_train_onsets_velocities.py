@@ -29,13 +29,14 @@ import pandas as pd
 from ov_piano import PIANO_MIDI_RANGE, HDF5PathManager
 from ov_piano.utils import ModelSaver, load_model, breakpoint_json, set_seed
 from ov_piano.logging import JsonColorLogger
-from ov_piano.data.maestro import MetaMAESTROv1, MetaMAESTROv2, MetaMAESTROv3
-from ov_piano.data.maestro import MelMaestro, MelMaestroChunks
+from ov_piano.data.PuDoMS import PuDoMS
+from ov_piano.data.PuDoMS import MelPuDoMS, MelPuDoMSChunks
 from ov_piano.models.ov import OnsetsAndVelocities
 from ov_piano.utils import MaskedBCEWithLogitsLoss
 from ov_piano.optimizers import AdamWR
 from ov_piano.inference import strided_inference, OnsetVelocityNmsDecoder
-from ov_piano.eval import GtLoaderMaestro, eval_note_events
+from ov_piano.eval import GtLoaderMaps, eval_note_events
+# from ov_piano.eval import GtLoaderMaestro, eval_note_events
 
 # import matplotlib.pyplot as plt
 
@@ -116,7 +117,8 @@ class ConfDef:
     OUTPUT_DIR: str = "out"
     #MAESTRO_PATH: str = os.path.join("data", "maestro", "maestro-v3.0.0")
     MONO_PATH: str = os.path.join("data", "MONO_pudoms")
-    MAESTRO_VERSION: int = 3
+    #MAESTRO_VERSION: int = 3
+    PUDOMS_VERSION: int = 1
     HDF5_MEL_PATH: str = os.path.join(
         "data",
         "PuDoMS_logmel_sr=16000_stft=2048w384h_mel=229(50-8000).h5")
@@ -192,8 +194,9 @@ if __name__ == "__main__":
     XV_CHUNK_SIZE = round(CONF.XV_CHUNK_SIZE / SECS_PER_FRAME)
     XV_CHUNK_OVERLAP = round(CONF.XV_CHUNK_OVERLAP / SECS_PER_FRAME)
     #
-    METAMAESTRO_CLASS = {1: MetaMAESTROv1, 2: MetaMAESTROv2,
-                         3: MetaMAESTROv3}[CONF.MAESTRO_VERSION]
+    META_CLASS = {1: MONO_pudoms}[CONF.PUDOMS_VERSION]
+    #METAMAESTRO_CLASS = {1: MetaMAESTROv1, 2: MetaMAESTROv2,
+                         #3: MetaMAESTROv3}[CONF.MAESTRO_VERSION]
     # output dirs
     MODEL_SNAPSHOT_OUTDIR = os.path.join(CONF.OUTPUT_DIR, "model_snapshots")
     TXT_LOG_OUTDIR = os.path.join(CONF.OUTPUT_DIR, "txt_logs")
@@ -205,36 +208,60 @@ if __name__ == "__main__":
     txt_logger.loj("PARAMETERS", OmegaConf.to_container(CONF))
 
     # datasets and dataloaders
-    metamaestro_train = METAMAESTRO_CLASS(
-        CONF.MAESTRO_PATH, splits=["train"], years=METAMAESTRO_CLASS.ALL_YEARS)
-    maestro_train = MelMaestroChunks(
+    # metamaestro_train = METAMAESTRO_CLASS(
+    #     CONF.MAESTRO_PATH, splits=["train"], years=METAMAESTRO_CLASS.ALL_YEARS)
+    # maestro_train = MelMaestroChunks(
+    #     CONF.HDF5_MEL_PATH, CONF.HDF5_ROLL_PATH,
+    #     CHUNK_LENGTH, CHUNK_STRIDE,
+    #     *(x[0] for x in metamaestro_train.data),
+    #     with_oob=True, logmel_oob_pad_val="min",
+    #     as_torch_tensors=False)
+    metapudoms_train = META_CLASS(
+        CONF.MONO_PATH, splits=["train"])
+    pudoms_train = MelPuDoMSChunks(
         CONF.HDF5_MEL_PATH, CONF.HDF5_ROLL_PATH,
         CHUNK_LENGTH, CHUNK_STRIDE,
-        *(x[0] for x in metamaestro_train.data),
+        *(x[0] for x in metapudoms_train.data),
         with_oob=True, logmel_oob_pad_val="min",
         as_torch_tensors=False)
+    # train_dl = torch.utils.data.DataLoader(
+    #     maestro_train, batch_size=CONF.TRAIN_BS, shuffle=True,
+    #     num_workers=CONF.DATALOADER_WORKERS,
+    #     pin_memory=False, persistent_workers=False)
     train_dl = torch.utils.data.DataLoader(
-        maestro_train, batch_size=CONF.TRAIN_BS, shuffle=True,
+        pudoms_train, batch_size=CONF.TRAIN_BS, shuffle=True,
         num_workers=CONF.DATALOADER_WORKERS,
         pin_memory=False, persistent_workers=False)
     #
-    metamaestro_xv = METAMAESTRO_CLASS(
-        CONF.MAESTRO_PATH, splits=["validation"],
-        years=METAMAESTRO_CLASS.ALL_YEARS)
+    # metamaestro_xv = METAMAESTRO_CLASS(
+    #     CONF.MAESTRO_PATH, splits=["validation"],
+    #     years=METAMAESTRO_CLASS.ALL_YEARS)
+    metapudoms_xv = META_CLASS(
+        CONF.MONO_PATH, splits=["validation"])
     # shorten xv set to speed up cross validation times
+    # txt_logger.loj("WARNING",
+    #                "shortening xv split for faster crossvalidation!")
+    # metamaestro_xv.data = metamaestro_xv.data[::5]
     txt_logger.loj("WARNING",
                    "shortening xv split for faster crossvalidation!")
-    metamaestro_xv.data = metamaestro_xv.data[::5]
+    metapudoms_xv.data = metapudoms_xv.data[::5]
     #
-    maestro_xv = MelMaestro(
+    # maestro_xv = MelMaestro(
+    #     CONF.HDF5_MEL_PATH, CONF.HDF5_ROLL_PATH,
+    #     *(x[0] for x in metamaestro_xv.data),
+    #     as_torch_tensors=False)
+    # xv_gt_loader = GtLoaderMaestro(maestro_xv, metamaestro_xv)
+    pudoms_xv = MelPuDoMS(
         CONF.HDF5_MEL_PATH, CONF.HDF5_ROLL_PATH,
-        *(x[0] for x in metamaestro_xv.data),
+        *(x[0] for x in metapudoms_xv.data),
         as_torch_tensors=False)
-    xv_gt_loader = GtLoaderMaestro(maestro_xv, metamaestro_xv)
+    #xv_gt_loader = GtLoaderMaestro(maestro_xv, metamaestro_xv)
+    xv_gt_loader = GtLoaderMaps(pudoms_xv, metapudoms_xv)
 
     # data-specific constants
     batches_per_epoch = len(train_dl)
-    num_mels = maestro_train[0][0].shape[0]
+    # num_mels = maestro_train[0][0].shape[0]
+    num_mels = pudoms_train[0][0].shape[0]
     key_beg, key_end = PIANO_MIDI_RANGE
     num_piano_keys = key_end - key_beg
 
@@ -394,8 +421,10 @@ if __name__ == "__main__":
     # ##########################################################################
     txt_logger.loj("MODEL_INFO", {"class": model.__class__.__name__})
     global_step = 1
-    onsets_beg, onsets_end = maestro_train.ONSETS_RANGE
-    frames_beg, frames_end = maestro_train.FRAMES_RANGE
+    onsets_beg, onsets_end = pudoms_train.ONSETS_RANGE
+    frames_beg, frames_end = pudoms_train.FRAMES_RANGE
+    # onsets_beg, onsets_end = maestro_train.ONSETS_RANGE
+    # frames_beg, frames_end = maestro_train.FRAMES_RANGE
     training_losses = []
     xv_results = []
     xv_results_vel = []
@@ -410,8 +439,10 @@ if __name__ == "__main__":
                 #
                 torch.cuda.empty_cache()
                 with torch.no_grad():
-                    len_xv = len(maestro_xv)
-                    for ii, (mel, roll, md) in enumerate(maestro_xv, 1):
+                    # len_xv = len(maestro_xv)
+                    len_xv = len(pudoms_xv)
+                    # for ii, (mel, roll, md) in enumerate(maestro_xv, 1):
+                    for ii, (mel, roll, md) in enumerate(pudoms_xv, 1):
                         txt_logger.loj(
                             "XV_PROCESSING",
                             {"idx": ii, "len_xv": len_xv, "filename": md[0]})
