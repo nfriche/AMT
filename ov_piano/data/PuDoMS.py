@@ -3,7 +3,7 @@
 
 
 """
-This module is analogous to ``maps``, but adapted for the MAESTRO dataset.
+This module is analogous to ``maps``, but adapted for the PuDoMS dataset.
 """
 
 
@@ -25,7 +25,7 @@ class PuDoMS:
     It can be used to manage PuDoMS files and to create custom dataloaders.
     """
 
-    CSV_NAME = "pudoms.csv"
+    CSV_NAME = "monophonic_midi.csv"
     ALL_SPLITS = {"train", "validation", "test"}
     AUDIO_EXT = ".wav"
     MIDI_EXT = ".midi"
@@ -68,14 +68,14 @@ class PuDoMS:
 # ##############################################################################
 # #  PYTORCH DATASETS
 # ##############################################################################
-class MelMaestro(MelMaps):
+class MelPuDoMS(MelMaps):
     """
     Identical to parent class
     """
     pass
 
 
-class MelMaestroChunks(MelMapsChunks):
+class MelPuDoMSChunks(MelMapsChunks):
     """
     Identical to parent class
     """
