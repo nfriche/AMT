@@ -40,7 +40,7 @@ class GtLoaderMaps:
     that can be used by the main eval class.
     """
     PARSER = SingletrackMidiParser
-    MIDI_EXT = ".mid"
+    MIDI_EXT = [".mid",".midi"]
     MIN_NOTE_DUR = 0.001  # in seconds
 
     @classmethod
