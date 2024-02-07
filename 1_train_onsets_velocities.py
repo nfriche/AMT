@@ -31,6 +31,8 @@ from ov_piano.utils import ModelSaver, load_model, breakpoint_json, set_seed
 from ov_piano.logging import JsonColorLogger
 from ov_piano.data.PuDoMS import PuDoMS
 from ov_piano.data.PuDoMS import MelPuDoMS, MelPuDoMSChunks
+# from ov_piano.data.maestro import MetaMAESTROv1, MetaMAESTROv2, MetaMAESTROv3
+# from ov_piano.data.maestro import MelMaestro, MelMaestroChunks
 from ov_piano.models.ov import OnsetsAndVelocities
 from ov_piano.utils import MaskedBCEWithLogitsLoss
 from ov_piano.optimizers import AdamWR
