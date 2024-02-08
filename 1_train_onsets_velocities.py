@@ -118,7 +118,7 @@ class ConfDef:
     # I/O
     OUTPUT_DIR: str = "out"
     #MAESTRO_PATH: str = os.path.join("data", "maestro", "maestro-v3.0.0")
-    MONO_PATH: str = os.path.join("data", "MONO_pudoms")
+    MONO_PATH: str = os.path.join("data", "PuDoMS")
     #MAESTRO_VERSION: int = 3
     PUDOMS_VERSION: int = 1
     HDF5_MEL_PATH: str = os.path.join(
