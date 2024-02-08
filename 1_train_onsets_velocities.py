@@ -127,7 +127,7 @@ class ConfDef:
         #"MAESTROv3_logmel_sr=16000_stft=2048w384h_mel=229(50-8000).h5")
     HDF5_ROLL_PATH: str = os.path.join(
         "data",
-        "PuDoMS_roll_quant=0.024_midivals=128_extendsus=True (1).h5")
+        "PuDoMS_roll_quant=0.024_midivals=128_extendsus=True.h5")
         #"MAESTROv3_roll_quant=0.024_midivals=128_extendsus=True.h5")
     #SNAPSHOT_INPATH: Optional[str] = "out/model_snapshots/OnsetsAndVelocities_2023_12_11_20_20_10.595.torch"
     SNAPSHOT_INPATH: Optional[str] = None
