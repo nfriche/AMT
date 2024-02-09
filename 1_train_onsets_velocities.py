@@ -322,6 +322,20 @@ if __name__ == "__main__":
         vels = F.pad(torch.sigmoid(vels), (1, 0))
         return probs, vels
 
+    def map_notes_to_octaves(notes):
+        """
+        Maps MIDI note numbers to their corresponding octave numbers.
+        Middle C (C4) is considered as MIDI note number 60.
+        Each octave spans 12 MIDI note numbers.
+        
+        Parameters:
+        - notes: Array of MIDI note numbers
+        
+        Returns:
+        - Array of octave numbers corresponding to the MIDI note numbers
+        """
+        return (notes // 12) - 1  # MIDI note number 60 (C4) will map to octave 4
+
     def xv_file(mel, md, thresholds=[0.5], verbose=False):
         """
         Convenience function to perform cross-validation on a single file:
@@ -388,6 +402,7 @@ if __name__ == "__main__":
                     "XV_ONSET_VEL",
                     {"threshold": t, "P": prec, "R": rec, "F1": f1})
         #
+        
         octave_results = []
         for t in thresholds:
             df_pred_t = df_pred[df_pred["prob"] >= t]
@@ -428,9 +443,9 @@ if __name__ == "__main__":
     # onsets_beg, onsets_end = maestro_train.ONSETS_RANGE
     # frames_beg, frames_end = maestro_train.FRAMES_RANGE
     training_losses = []
-    xv_results = []
-    xv_results_vel = []
-    octave_results = []
+    xv_results_list = []
+    xv_results_vel_list = []
+    octave_results_list = []
     for epoch in range(1, CONF.NUM_EPOCHS + 1):
         for i, (logmels, rolls, metas) in enumerate(train_dl):
             # ##################################################################
