@@ -114,10 +114,17 @@ class GtLoaderMaestro(GtLoaderMaps):
           given metadata, such that it can be found in the meta_dataset.
         """
         # basename, year, _, _, _, _ = data_md
-        basename, _, _, _, _ = data_md
-        # path = os.path.join(meta_dataset.rootpath, str(year), basename)
+        basename, *rest = data_md  # Adjusted to a flexible unpacking if data_md structure varies
         path = os.path.join(meta_dataset.rootpath, basename)
-        return path + cls.MIDI_EXT
+        # Check for existing file with any of the listed extensions
+        for ext in cls.MIDI_EXT:
+            full_path = path + ext
+            if os.path.exists(full_path):
+                return full_path
+        # If no file is found, return None or raise an error
+        raise FileNotFoundError(f"No MIDI file found for {basename} with expected extensions.")
+        # path = os.path.join(meta_dataset.rootpath, str(year), basename)
+        # return path + cls.MIDI_EXT
 
 
 # ##############################################################################
