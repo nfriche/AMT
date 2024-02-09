@@ -20,7 +20,8 @@ import numpy as np
 from concurrent.futures import ProcessPoolExecutor
 #
 from .data.key_model import KeyboardStateMachine
-from .data.midi import SingletrackMidiParser, MaestroMidiParser
+from .data.midi import SingletrackMidiParser, GeneralMidiParser
+# from .data.midi import SingletrackMidiParser, MaestroMidiParser
 from .data.midi import MidiToPianoRoll
 from mir_eval.transcription import precision_recall_f1_overlap as prf1o
 from mir_eval.transcription_velocity import precision_recall_f1_overlap \
@@ -103,7 +104,8 @@ class GtLoaderMaestro(GtLoaderMaps):
     """
     Extension of ``GtLoaderMaps`` for MAESTRO.
     """
-    PARSER = MaestroMidiParser
+    # PARSER = MaestroMidiParser
+    PARSER = GeneralMidiParser
     MIDI_EXT = [".mid",".midi"]
 
     @classmethod
