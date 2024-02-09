@@ -104,7 +104,7 @@ class GtLoaderMaestro(GtLoaderMaps):
     Extension of ``GtLoaderMaps`` for MAESTRO.
     """
     PARSER = MaestroMidiParser
-    MIDI_EXT = ".midi"
+    MIDI_EXT = [".mid",".midi"]
 
     @classmethod
     def get_metadata_path(cls, data_md, meta_dataset):
@@ -113,8 +113,10 @@ class GtLoaderMaestro(GtLoaderMaps):
           metadata. This method reconstructs the complete path from this
           given metadata, such that it can be found in the meta_dataset.
         """
-        basename, year, _, _, _, _ = data_md
-        path = os.path.join(meta_dataset.rootpath, str(year), basename)
+        # basename, year, _, _, _, _ = data_md
+        basename, _, _, _, _ = data_md
+        # path = os.path.join(meta_dataset.rootpath, str(year), basename)
+        path = os.path.join(meta_dataset.rootpath, basename)
         return path + cls.MIDI_EXT
 
 
