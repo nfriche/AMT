@@ -412,7 +412,15 @@ if __name__ == "__main__":
             df_gt_octave['octave'] = map_notes_to_octaves(df_gt_octave['key'].to_numpy())
             df_pred_t_octave = df_pred_t.copy()
             df_pred_t_octave['octave'] = map_notes_to_octaves(df_pred_t_octave['key'].to_numpy())
-    
+
+            # Assuming MIDI notes range from 21 (A0) to 108 (C8)
+            min_midi_note = 21  # A0
+            max_midi_note = 108  # C8
+            
+            # Calculate min and max octaves from the MIDI note numbers
+            min_octave = (min_midi_note // 12) - 1
+            max_octave = (max_midi_note // 12) - 1
+
             for octave in range(min_octave, max_octave + 1):
                 gt_octave = df_gt_octave[df_gt_octave['octave'] == octave]
                 pred_octave = df_pred_t_octave[df_pred_t_octave['octave'] == octave]
