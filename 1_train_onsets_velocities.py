@@ -484,7 +484,7 @@ if __name__ == "__main__":
                 xv_dfs = [(t, pd.DataFrame(
                     x, columns=["filename", "P", "R", "F1"]))
                           for t, x in zip(CONF.XV_THRESHOLDS,
-                                          zip(*xv_results))]
+                                          zip(*xv_results_list))]
                 f1_avgs = []
                 for t, df in xv_dfs:
                     averages = [f"AVERAGES (t={t})",
@@ -496,7 +496,7 @@ if __name__ == "__main__":
                 # compare vel results and report best
                 xv_dfs_vel = [
                     (t, pd.DataFrame(x, columns=["filename", "P", "R", "F1"]))
-                    for t, x in zip(CONF.XV_THRESHOLDS, zip(*xv_results_vel))]
+                    for t, x in zip(CONF.XV_THRESHOLDS, zip(*xv_results_vel_list))]
                 f1_avgs_vel = []
                 for t, df in xv_dfs_vel:
                     averages = [f"AVERAGES (t={t})",
