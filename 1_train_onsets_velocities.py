@@ -450,10 +450,6 @@ if __name__ == "__main__":
     frames_beg, frames_end = pudoms_train.FRAMES_RANGE
     # onsets_beg, onsets_end = maestro_train.ONSETS_RANGE
     # frames_beg, frames_end = maestro_train.FRAMES_RANGE
-    training_losses = []
-    xv_results_list = []
-    xv_results_vel_list = []
-    octave_results_list = []
     for epoch in range(1, CONF.NUM_EPOCHS + 1):
         for i, (logmels, rolls, metas) in enumerate(train_dl):
             # ##################################################################
@@ -464,6 +460,10 @@ if __name__ == "__main__":
                 #
                 torch.cuda.empty_cache()
                 with torch.no_grad():
+                    training_losses = []
+                    xv_results_list = []
+                    xv_results_vel_list = []
+                    octave_results_list = []
                     # len_xv = len(maestro_xv)
                     len_xv = len(pudoms_xv)
                     # for ii, (mel, roll, md) in enumerate(maestro_xv, 1):
