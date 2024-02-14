@@ -66,6 +66,8 @@ class SingletrackMidiParser:
             return (msg_name, msg.value, msg.channel)
         elif msg.type == "program_change":
             return (msg.type, msg.program, msg.channel)
+        elif msg.type == "pitchwheel":
+            return (msg.type, msg.pitch, msg.channel)
         else:
             raise RuntimeError(f"Unhandled message! {msg}")
 
