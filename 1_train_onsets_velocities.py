@@ -123,11 +123,11 @@ class ConfDef:
     PUDOMS_VERSION: int = 1
     HDF5_MEL_PATH: str = os.path.join(
         "data",
-        "PuDoMS_logmel_sr=16000_stft=2048w384h_mel=229(50-8000).h5")
+        "MONO_PuDoMS_logmel_sr=16000_stft=2048w384h_mel=229(50-8000).h5")
         #"MAESTROv3_logmel_sr=16000_stft=2048w384h_mel=229(50-8000).h5")
     HDF5_ROLL_PATH: str = os.path.join(
         "data",
-        "PuDoMS_roll_quant=0.024_midivals=128_extendsus=True.h5")
+        "MONO_PuDoMS_roll_quant=0.024_midivals=128_extendsus=True.h5")
         #"MAESTROv3_roll_quant=0.024_midivals=128_extendsus=True.h5")
     #SNAPSHOT_INPATH: Optional[str] = "out/model_snapshots/OnsetsAndVelocities_2023_12_11_20_20_10.595.torch"
     SNAPSHOT_INPATH: Optional[str] = None
@@ -262,8 +262,7 @@ if __name__ == "__main__":
 
     # data-specific constants
     batches_per_epoch = len(train_dl)
-    # num_mels = maestro_train[0][0].shape[0]
-    num_mels = pudoms_train[0][0].shape[0]
+    num_mels = maestro_train[0][0].shape[0]
     key_beg, key_end = PIANO_MIDI_RANGE
     num_piano_keys = key_end - key_beg
 
@@ -321,20 +320,6 @@ if __name__ == "__main__":
         probs = F.pad(torch.sigmoid(probs[-1]), (1, 0))
         vels = F.pad(torch.sigmoid(vels), (1, 0))
         return probs, vels
-
-    def map_notes_to_octaves(notes):
-        """
-        Maps MIDI note numbers to their corresponding octave numbers.
-        Middle C (C4) is considered as MIDI note number 60.
-        Each octave spans 12 MIDI note numbers.
-        
-        Parameters:
-        - notes: Array of MIDI note numbers
-        
-        Returns:
-        - Array of octave numbers corresponding to the MIDI note numbers
-        """
-        return (notes // 12) - 1  # MIDI note number 60 (C4) will map to octave 4
 
     def xv_file(mel, md, thresholds=[0.5], verbose=False):
         """
@@ -402,44 +387,7 @@ if __name__ == "__main__":
                     "XV_ONSET_VEL",
                     {"threshold": t, "P": prec, "R": rec, "F1": f1})
         #
-        
-        octave_results = []
-        for t in thresholds:
-            df_pred_t = df_pred[df_pred["prob"] >= t]
-    
-            # Group by octave
-            df_gt_octave = df_gt.copy()
-            df_gt_octave['octave'] = map_notes_to_octaves(df_gt_octave['key'].to_numpy())
-            df_pred_t_octave = df_pred_t.copy()
-            df_pred_t_octave['octave'] = map_notes_to_octaves(df_pred_t_octave['key'].to_numpy())
-
-            # Assuming MIDI notes range from 21 (A0) to 108 (C8)
-            min_midi_note = 21  # A0
-            max_midi_note = 108  # C8
-            
-            # Calculate min and max octaves from the MIDI note numbers
-            min_octave = (min_midi_note // 12) - 1
-            max_octave = (max_midi_note // 12) - 1
-
-            for octave in range(min_octave, max_octave + 1):
-                gt_octave = df_gt_octave[df_gt_octave['octave'] == octave]
-                pred_octave = df_pred_t_octave[df_pred_t_octave['octave'] == octave]
-    
-                # Compute metrics
-                prec, rec, f1 = eval_note_events(
-                    gt_octave['onset'].to_numpy(),
-                    gt_octave['key'].to_numpy(),
-                    pred_octave['t_idx'].to_numpy(),
-                    pred_octave['key'].to_numpy(),
-                    # ... other parameters ...
-                )
-                octave_results.append((md[0], octave, t, prec, rec, f1))
-                if verbose:
-                    txt_logger.loj(
-                        "XV_OCTAVE",
-                        {"octave": octave, "threshold": t, "P": prec, "R": rec, "F1": f1})
-                
-        return results, results_vel, octave_results
+        return results, results_vel
 
     # ##########################################################################
     # # TRAINING LOOP
@@ -450,6 +398,7 @@ if __name__ == "__main__":
     frames_beg, frames_end = pudoms_train.FRAMES_RANGE
     # onsets_beg, onsets_end = maestro_train.ONSETS_RANGE
     # frames_beg, frames_end = maestro_train.FRAMES_RANGE
+    training_losses = []
     for epoch in range(1, CONF.NUM_EPOCHS + 1):
         for i, (logmels, rolls, metas) in enumerate(train_dl):
             # ##################################################################
@@ -460,10 +409,8 @@ if __name__ == "__main__":
                 #
                 torch.cuda.empty_cache()
                 with torch.no_grad():
-                    training_losses = []
-                    xv_results_list = []
-                    xv_results_vel_list = []
-                    octave_results_list = []
+                    xv_results = []
+                    xv_results_vel = []
                     # len_xv = len(maestro_xv)
                     len_xv = len(pudoms_xv)
                     # for ii, (mel, roll, md) in enumerate(maestro_xv, 1):
@@ -471,10 +418,10 @@ if __name__ == "__main__":
                         txt_logger.loj(
                             "XV_PROCESSING",
                             {"idx": ii, "len_xv": len_xv, "filename": md[0]})
-                        xv_result, xv_result_vel, octave_result = xv_file(mel, md, CONF.XV_THRESHOLDS)
-                        xv_results_list.extend(xv_result)
-                        xv_results_vel_list.extend(xv_result_vel)
-                        octave_results_list.extend(octave_result)
+                        xv_result, xv_result_vel = xv_file(
+                            mel, md, CONF.XV_THRESHOLDS)
+                        xv_results.append(xv_result)
+                        xv_results_vel.append(xv_result_vel)
                 # add loss to list        
                 if CONF.TRAINABLE_ONSETS:
                     training_losses.append((epoch, global_step, vel_loss.item(), ons_loss.item()))
@@ -484,7 +431,7 @@ if __name__ == "__main__":
                 xv_dfs = [(t, pd.DataFrame(
                     x, columns=["filename", "P", "R", "F1"]))
                           for t, x in zip(CONF.XV_THRESHOLDS,
-                                          zip(*xv_results_list))]
+                                          zip(*xv_results))]
                 f1_avgs = []
                 for t, df in xv_dfs:
                     averages = [f"AVERAGES (t={t})",
@@ -496,7 +443,7 @@ if __name__ == "__main__":
                 # compare vel results and report best
                 xv_dfs_vel = [
                     (t, pd.DataFrame(x, columns=["filename", "P", "R", "F1"]))
-                    for t, x in zip(CONF.XV_THRESHOLDS, zip(*xv_results_vel_list))]
+                    for t, x in zip(CONF.XV_THRESHOLDS, zip(*xv_results_vel))]
                 f1_avgs_vel = []
                 for t, df in xv_dfs_vel:
                     averages = [f"AVERAGES (t={t})",
@@ -594,17 +541,4 @@ if __name__ == "__main__":
     loss_columns = ['Epoch', 'Step', 'Velocity_Loss', 'Onset_Loss'] if CONF.TRAINABLE_ONSETS else ['Epoch', 'Step', 'Velocity_Loss']
     df_losses = pd.DataFrame(training_losses, columns=loss_columns)
     df_losses.to_csv(os.path.join(results_folder, 'training_losses.csv'), index=False)
-
-    # For xv_results_list
-    df_xv_results = pd.DataFrame(xv_results_list, columns=['Filename', 'Precision', 'Recall', 'F1'])
-    df_xv_results.to_csv(os.path.join(results_folder, 'xv_results.csv'), index=False)
-    
-    # For xv_results_vel_list
-    df_xv_results_vel = pd.DataFrame(xv_results_vel_list, columns=['Filename', 'Precision', 'Recall', 'F1'])
-    df_xv_results_vel.to_csv(os.path.join(results_folder, 'xv_results_vel.csv'), index=False)
-
-    # For octave_results_list
-    df_octave_results = pd.DataFrame(octave_results_list, columns=['Filename', 'Octave', 'Threshold', 'Precision', 'Recall', 'F1'])
-    df_octave_results.to_csv(os.path.join(results_folder, 'octave_results.csv'), index=False)
-
 
