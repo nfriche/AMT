@@ -262,7 +262,8 @@ if __name__ == "__main__":
 
     # data-specific constants
     batches_per_epoch = len(train_dl)
-    num_mels = maestro_train[0][0].shape[0]
+    # num_mels = maestro_train[0][0].shape[0]
+    num_mels = pudoms_train[0][0].shape[0]
     key_beg, key_end = PIANO_MIDI_RANGE
     num_piano_keys = key_end - key_beg
 
