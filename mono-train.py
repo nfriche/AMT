@@ -540,4 +540,4 @@ if __name__ == "__main__":
     # Save the training losses to a CSV file
     loss_columns = ['Epoch', 'Step', 'Velocity_Loss', 'Onset_Loss'] if CONF.TRAINABLE_ONSETS else ['Epoch', 'Step', 'Velocity_Loss']
     df_losses = pd.DataFrame(training_losses, columns=loss_columns)
-    df_losses.to_csv(os.path.join(results_folder, 'training_losses.csv'), index=False)
+    df_losses.to_csv(os.path.join(results_folder, '5_training_losses.csv'), index=False)
