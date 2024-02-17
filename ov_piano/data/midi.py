@@ -175,6 +175,8 @@ class SingletrackMidiParser:
                 pass
             elif m_type == "unknown_control":
                 pass
+            elif m_type == "pitchwheel":
+                pass
             else:
                 raise RuntimeError(f"Unhandled MIDI event! {(ts, m)}")
             #
