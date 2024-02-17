@@ -130,7 +130,7 @@ class ConfDef:
         # "MONO_PuDoMS_roll_quant=0.024_midivals=128_extendsus=True.h5")
         "MAESTROv3_roll_quant=0.024_midivals=128_extendsus=True.h5")
     SNAPSHOT_INPATH: Optional[str] = "out/model_snapshots/OnsetsAndVelocities_2024_02_16_15_26_29.734.torch"
-    SNAPSHOT_INPATH: Optional[str] = None
+    # SNAPSHOT_INPATH: Optional[str] = None
     # data loader
     TRAIN_BS: int = 40
     TRAIN_BATCH_SECS: float = 5.0
