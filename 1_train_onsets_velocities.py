@@ -37,8 +37,8 @@ from ov_piano.models.ov import OnsetsAndVelocities
 from ov_piano.utils import MaskedBCEWithLogitsLoss
 from ov_piano.optimizers import AdamWR
 from ov_piano.inference import strided_inference, OnsetVelocityNmsDecoder
-# from ov_piano.eval import GtLoaderMaps, eval_note_events
-from ov_piano.eval import GtLoaderMaestro, eval_note_events
+# from ov_piano.eval import GtLoaderMaestro, eval_note_events
+from ov_piano.eval import GtLoaderPuDoMS, eval_note_events
 
 # import matplotlib.pyplot as plt
 
@@ -258,7 +258,7 @@ if __name__ == "__main__":
         *(x[0] for x in metapudoms_xv.data),
         as_torch_tensors=False)
     # xv_gt_loader = GtLoaderMaestro(maestro_xv, metamaestro_xv)
-    xv_gt_loader = GtLoaderMaestro(pudoms_xv, metapudoms_xv)
+    xv_gt_loader = GtLoaderPuDoMS(pudoms_xv, metapudoms_xv)
 
     # data-specific constants
     batches_per_epoch = len(train_dl)
