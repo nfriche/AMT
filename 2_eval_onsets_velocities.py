@@ -109,7 +109,7 @@ class ConfDef:
         "MAESTROv3_roll_quant=0.024_midivals=128_extendsus=True.h5")
     SNAPSHOT_INPATH: str = os.path.join("out",
                                         "model_snapshots",
-                                        "OnsetsAndVelocities_2024_01_09_22_29_02.308__step=143000_f1=0.9663__0.9492.torch")
+                                        "OnsetsAndVelocities_2024_02_16_15_26_29.734.torch")
     #
     CONV1X1: List[int] = (200, 200)
     LEAKY_RELU_SLOPE: Optional[float] = 0.1
