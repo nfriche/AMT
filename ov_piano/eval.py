@@ -104,6 +104,25 @@ class GtLoaderMaestro(GtLoaderMaps):
     """
     Extension of ``GtLoaderMaps`` for MAESTRO.
     """
+    PARSER = MaestroMidiParser
+    MIDI_EXT = ".midi"
+
+    @classmethod
+    def get_metadata_path(cls, data_md, meta_dataset):
+        """
+        :param dataset_md: along with the logmels and rolls, datasets provide
+          metadata. This method reconstructs the complete path from this
+          given metadata, such that it can be found in the meta_dataset.
+        """
+        basename, year, _, _, _, _ = data_md
+        path = os.path.join(meta_dataset.rootpath, str(year), basename)
+        return path + cls.MIDI_EXT
+      
+
+class GtLoaderPuDoMS(GtLoaderMaps):
+    """
+    Extension of ``GtLoaderMaps`` for MAESTRO.
+    """
     # PARSER = MaestroMidiParser
     PARSER = GeneralMidiParser
     MIDI_EXT = [".mid",".midi"]
@@ -127,6 +146,8 @@ class GtLoaderMaestro(GtLoaderMaps):
         raise FileNotFoundError(f"No MIDI file found for {basename} with expected extensions.")
         # path = os.path.join(meta_dataset.rootpath, str(year), basename)
         # return path + cls.MIDI_EXT
+
+
 
 
 # ##############################################################################
