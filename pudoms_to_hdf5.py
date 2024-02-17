@@ -137,7 +137,7 @@ if __name__ == "__main__":
     loop_length = len(all.data)
 
     for i, (path, meta) in enumerate(all.data, 1):
-                basepath = os.path.basename(path)
+        basepath = os.path.basename(path)
         # Construct the MIDI file path with .mid extension
         midipath_mid = os.path.join(CONF.INPATH, f"{basepath}.mid")
         # Construct the MIDI file path with .midi extension
