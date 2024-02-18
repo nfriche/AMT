@@ -29,7 +29,7 @@ import pandas as pd
 from ov_piano import PIANO_MIDI_RANGE, HDF5PathManager
 from ov_piano.utils import ModelSaver, load_model, breakpoint_json, set_seed
 from ov_piano.logging import JsonColorLogger
-from ov_piano.data.PuDoMS import MONO_pudoms
+from ov_piano.data.PuDoMS import PuDoMS
 from ov_piano.data.PuDoMS import MelPuDoMS, MelPuDoMSChunks
 # from ov_piano.data.maestro import MetaMAESTROv1, MetaMAESTROv2, MetaMAESTROv3
 # from ov_piano.data.maestro import MelMaestro, MelMaestroChunks
@@ -118,16 +118,16 @@ class ConfDef:
     # I/O
     OUTPUT_DIR: str = "out"
     #MAESTRO_PATH: str = os.path.join("data", "maestro", "maestro-v3.0.0")
-    MONO_PATH: str = os.path.join("data", "PuDoMS")
+    PUDOMS_PATH: str = os.path.join("data", "PuDoMS")
     #MAESTRO_VERSION: int = 3
     PUDOMS_VERSION: int = 1
     HDF5_MEL_PATH: str = os.path.join(
         "data",
-        "MONO_PuDoMS_logmel_sr=16000_stft=2048w384h_mel=229(50-8000).h5")
+        "PuDoMS_logmel_sr=16000_stft=2048w384h_mel=229(50-8000).h5")
         #"MAESTROv3_logmel_sr=16000_stft=2048w384h_mel=229(50-8000).h5")
     HDF5_ROLL_PATH: str = os.path.join(
         "data",
-        "MONO_PuDoMS_roll_quant=0.024_midivals=128_extendsus=True.h5")
+        "PuDoMS_roll_quant=0.024_midivals=128_extendsus=True.h5")
         #"MAESTROv3_roll_quant=0.024_midivals=128_extendsus=True.h5")
     #SNAPSHOT_INPATH: Optional[str] = "out/model_snapshots/OnsetsAndVelocities_2023_12_11_20_20_10.595.torch"
     SNAPSHOT_INPATH: Optional[str] = None
@@ -196,7 +196,7 @@ if __name__ == "__main__":
     XV_CHUNK_SIZE = round(CONF.XV_CHUNK_SIZE / SECS_PER_FRAME)
     XV_CHUNK_OVERLAP = round(CONF.XV_CHUNK_OVERLAP / SECS_PER_FRAME)
     #
-    META_CLASS = {1: MONO_pudoms}[CONF.PUDOMS_VERSION]
+    META_CLASS = {1: PuDoMS}[CONF.PUDOMS_VERSION]
     #METAMAESTRO_CLASS = {1: MetaMAESTROv1, 2: MetaMAESTROv2,
                          #3: MetaMAESTROv3}[CONF.MAESTRO_VERSION]
     # output dirs
@@ -219,7 +219,7 @@ if __name__ == "__main__":
     #     with_oob=True, logmel_oob_pad_val="min",
     #     as_torch_tensors=False)
     metapudoms_train = META_CLASS(
-        CONF.MONO_PATH, splits=["train"])
+        CONF.PUDOMS_PATH, splits=["train"])
     pudoms_train = MelPuDoMSChunks(
         CONF.HDF5_MEL_PATH, CONF.HDF5_ROLL_PATH,
         CHUNK_LENGTH, CHUNK_STRIDE,
@@ -239,7 +239,7 @@ if __name__ == "__main__":
     #     CONF.MAESTRO_PATH, splits=["validation"],
     #     years=METAMAESTRO_CLASS.ALL_YEARS)
     metapudoms_xv = META_CLASS(
-        CONF.MONO_PATH, splits=["validation"])
+        CONF.PUDOMS_PATH, splits=["validation"])
     # shorten xv set to speed up cross validation times
     # txt_logger.loj("WARNING",
     #                "shortening xv split for faster crossvalidation!")
