@@ -357,13 +357,17 @@ class MelMaps(torch.utils.data.Dataset):
             "Unexpected number of columns in pianoroll HDF5 file!"
         # extract metadata and file idxs matching given basenames   
         metadata = []
+        def preprocess_metadata_string(s):
+          return s.replace("nan", "None")
+        metadata = []
         for t in h5m[IncrementalHDF5.METADATA_NAME]:
             try:
-                decoded_metadata = t.decode("utf-8")
-                parsed_metadata = literal_eval(decoded_metadata)
+                preprocessed_metadata = preprocess_metadata_string(t.decode("utf-8"))
+                parsed_metadata = literal_eval(preprocessed_metadata)
                 metadata.append(parsed_metadata)
             except ValueError as e:
-                print(f"Error parsing metadata: {decoded_metadata}. Exception: {e}")
+                print(f"Error parsing metadata: {t.decode('utf-8')}. Exception: {e}")
+                continue
         # metadata = [literal_eval(t.decode("utf-8"))
         #             for t in h5m[IncrementalHDF5.METADATA_NAME]]
         chosen_metadata, chosen_file_idxs = zip(
