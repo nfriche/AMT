@@ -368,6 +368,9 @@ class MelMaps(torch.utils.data.Dataset):
         #             for t in h5m[IncrementalHDF5.METADATA_NAME]]
         chosen_metadata, chosen_file_idxs = zip(
             *[(x, i) for i, x in enumerate(metadata) if x[0] in basenames])
+        print(f"Number of files found: {len(chosen_file_idxs)}, Number of basenames provided: {len(basenames)}")
+        missing_basenames = [basename for basename in basenames if basename not in [metadata[i][0] for i in chosen_file_idxs]]
+        print(f"Missing files for basenames: {missing_basenames}")
         assert len(chosen_file_idxs) == len(basenames), \
             "HDF5 database is missing files?"
         # return HDF5 file handles and chosen idxs/metadata
