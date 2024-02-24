@@ -109,7 +109,7 @@ class ConfDef:
         "MAESTROv3_roll_quant=0.024_midivals=128_extendsus=True.h5")
     SNAPSHOT_INPATH: str = os.path.join("out",
                                         "model_snapshots",
-                                        "OnsetsAndVelocities_2024_02_20_21_12_23.340.torch")
+                                        "OnsetsAndVelocities_2024_02_23_13_52_00.732__step=143000_f1=0.9638__0.9467.torch")
     #
     CONV1X1: List[int] = (200, 200)
     LEAKY_RELU_SLOPE: Optional[float] = 0.1
@@ -319,5 +319,5 @@ if __name__ == "__main__":
     results_folder = "results"
     os.makedirs(results_folder, exist_ok=True)
     
-    test_results_df.to_csv(os.path.join(results_folder, 'maestro5_test_results.csv'), index=False)
-    test_results_df_vel.to_csv(os.path.join(results_folder, 'maestro5_test_results_vel.csv'), index=False)
+    test_results_df.to_csv(os.path.join(results_folder, 'maestro10_test_results.csv'), index=False)
+    test_results_df_vel.to_csv(os.path.join(results_folder, 'maestro10_test_results_vel.csv'), index=False)
