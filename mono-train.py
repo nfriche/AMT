@@ -129,7 +129,7 @@ class ConfDef:
         "data",
         # "MONO_PuDoMS_roll_quant=0.024_midivals=128_extendsus=True.h5")
         "MAESTROv3_roll_quant=0.024_midivals=128_extendsus=True.h5")
-    SNAPSHOT_INPATH: Optional[str] = "out/model_snapshots/OnsetsAndVelocities_2024_02_16_15_26_29.734.torch"
+    SNAPSHOT_INPATH: Optional[str] = "out/model_snapshots/OnsetsAndVelocities_2024_02_16_01_28_53.825__step=16000_f1=0.9873__0.9873.torch"
     # SNAPSHOT_INPATH: Optional[str] = None
     # data loader
     TRAIN_BS: int = 40
@@ -156,7 +156,7 @@ class ConfDef:
     DECODER_GAUSS_STD: float = 1
     DECODER_GAUSS_KSIZE: int = 11
     # training loop
-    NUM_EPOCHS: int = 15
+    NUM_EPOCHS: int = 10
     TRAIN_LOG_EVERY: int = 10
     XV_EVERY: int = 1000
     XV_CHUNK_SIZE: float = 600
@@ -540,4 +540,4 @@ if __name__ == "__main__":
     # Save the training losses to a CSV file
     loss_columns = ['Epoch', 'Step', 'Velocity_Loss', 'Onset_Loss'] if CONF.TRAINABLE_ONSETS else ['Epoch', 'Step', 'Velocity_Loss']
     df_losses = pd.DataFrame(training_losses, columns=loss_columns)
-    df_losses.to_csv(os.path.join(results_folder, '5_training_losses.csv'), index=False)
+    df_losses.to_csv(os.path.join(results_folder, '5_5_training_losses.csv'), index=False)
