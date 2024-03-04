@@ -138,11 +138,17 @@ class ConfDef:
     # model/optimizer
     CONV1X1: List[int] = (200, 200)
     # optimizer
-    LR_MAX: float = 0.008
-    LR_WARMUP: float = 0.5
-    LR_PERIOD: int = 1000
-    LR_DECAY: float = 0.975
-    LR_SLOWDOWN: float = 1.0
+    # LR_MAX: float = 0.008
+    # LR_WARMUP: float = 0.5
+    # LR_PERIOD: int = 1000
+    # LR_DECAY: float = 0.975
+    # LR_SLOWDOWN: float = 1.0
+    LR_MAX: float = 0.0008  # Lower maximum learning rate for fine-tuning
+    LR_WARMUP: float = 0.5  # Keep the same warm-up proportion
+    LR_PERIOD: int = 3000   # Longer periods to adjust to the new dataset
+    LR_DECAY: float = 0.98  # Slightly more conservative decay
+    LR_SLOWDOWN: float = 1.0  # Assuming this keeps the cycle duration constant
+    
     MOMENTUM: float = 0.95
     WEIGHT_DECAY: float = 0.0003
     BATCH_NORM: float = 0.95
@@ -399,6 +405,7 @@ if __name__ == "__main__":
     onsets_beg, onsets_end = maestro_train.ONSETS_RANGE
     frames_beg, frames_end = maestro_train.FRAMES_RANGE
     training_losses = []
+    xv_metrics = []
     for epoch in range(1, CONF.NUM_EPOCHS + 1):
         for i, (logmels, rolls, metas) in enumerate(train_dl):
             # ##################################################################
@@ -422,6 +429,8 @@ if __name__ == "__main__":
                             mel, md, CONF.XV_THRESHOLDS)
                         xv_results.append(xv_result)
                         xv_results_vel.append(xv_result_vel)
+                        xv_metrics.extend(xv_result)  
+                        xv_metrics.extend(xv_result_vel)
                 # add loss to list        
                 if CONF.TRAINABLE_ONSETS:
                     training_losses.append((epoch, global_step, vel_loss.item(), ons_loss.item()))
@@ -540,4 +549,9 @@ if __name__ == "__main__":
     # Save the training losses to a CSV file
     loss_columns = ['Epoch', 'Step', 'Velocity_Loss', 'Onset_Loss'] if CONF.TRAINABLE_ONSETS else ['Epoch', 'Step', 'Velocity_Loss']
     df_losses = pd.DataFrame(training_losses, columns=loss_columns)
-    df_losses.to_csv(os.path.join(results_folder, '5_5_training_losses.csv'), index=False)
+    df_losses.to_csv(os.path.join(results_folder, 'LR5_5_training_losses.csv'), index=False)
+
+    # Convert the cross-validation metrics to a DataFrame
+    xv_columns = ['File_Name', 'Threshold', 'Precision', 'Recall', 'F1']
+    df_xv_metrics = pd.DataFrame(xv_metrics, columns=xv_columns)
+    df_xv_metrics.to_csv(os.path.join(results_folder, 'LR5_5_xv_metrics.csv'), index=False)
