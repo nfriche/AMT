@@ -204,7 +204,7 @@ def save_model(model, optimizer, epoch, path):
     torch.save(state, path)
 
 
-def load_model(model, path, optimizer=None, eval_phase=True, strict=True, to_cpu=False):
+def load_model(model, path, optimizer=None, eval_phase=True, strict=True, to_cpu=True):
     """
     Loads the model (and optionally the optimizer) from a given path.
     """
