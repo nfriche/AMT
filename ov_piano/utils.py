@@ -208,7 +208,7 @@ def load_model(model, path, optimizer=None, eval_phase=True, strict=True, to_cpu
     """
     Loads the model (and optionally the optimizer) from a given path.
     """
-    checkpoint = torch.load(path, map_location="cpu" if to_cpu else None)
+    checkpoint = torch.load(path, map_location=torch.device('cpu') if to_cpu else None)
     # Load the model state_dict
     model.load_state_dict(checkpoint['state_dict'], strict=strict)
     # If an optimizer is provided, load its state_dict
