@@ -37,8 +37,8 @@ if __name__ == "__main__":
 
     os.makedirs(CONF.OUTPUT_DIR, exist_ok=True)
     if not CONF.IGNORE_MEL:
-        HDF5_MEL_OUTPATH = os.path.join(CONF.OUTPUT_DIR, HDF5PathManager.get_mel_hdf5_basename(f"PuDoMS1", CONF.TARGET_SR, CONF.STFT_WINSIZE, CONF.STFT_HOPSIZE, CONF.MELBINS, CONF.MEL_FMIN, CONF.MEL_FMAX))
-    HDF5_ROLL_OUTPATH = os.path.join(CONF.OUTPUT_DIR, HDF5PathManager.get_roll_hdf5_basename(f"PuDoMS1", MIDI_QUANT_SECS, MidiToPianoRoll.NUM_MIDI_VALUES, CONF.MIDI_SUS_EXTEND))
+        HDF5_MEL_OUTPATH = os.path.join(CONF.OUTPUT_DIR, HDF5PathManager.get_mel_hdf5_basename(f"PuDoMS", CONF.TARGET_SR, CONF.STFT_WINSIZE, CONF.STFT_HOPSIZE, CONF.MELBINS, CONF.MEL_FMIN, CONF.MEL_FMAX))
+    HDF5_ROLL_OUTPATH = os.path.join(CONF.OUTPUT_DIR, HDF5PathManager.get_roll_hdf5_basename(f"PuDoMS", MIDI_QUANT_SECS, MidiToPianoRoll.NUM_MIDI_VALUES, CONF.MIDI_SUS_EXTEND))
 
     all = METACLASS(CONF.INPATH, splits=PuDoMS.ALL_SPLITS)
 
