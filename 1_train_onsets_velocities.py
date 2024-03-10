@@ -118,16 +118,16 @@ class ConfDef:
     # I/O
     OUTPUT_DIR: str = "out"
     #MAESTRO_PATH: str = os.path.join("data", "maestro", "maestro-v3.0.0")
-    PUDOMS_PATH: str = os.path.join("data", "PuDoMS")
+    PUDOMS_PATH: str = os.path.join("data", "PuDoMS1")
     #MAESTRO_VERSION: int = 3
     PUDOMS_VERSION: int = 1
     HDF5_MEL_PATH: str = os.path.join(
         "data",
-        "PuDoMS_logmel_sr=16000_stft=2048w384h_mel=229(50-8000).h5")
+        "PuDoMS1_logmel_sr=16000_stft=2048w384h_mel=229(50-8000).h5")
         #"MAESTROv3_logmel_sr=16000_stft=2048w384h_mel=229(50-8000).h5")
     HDF5_ROLL_PATH: str = os.path.join(
         "data",
-        "PuDoMS_roll_quant=0.024_midivals=128_extendsus=True.h5")
+        "PuDoMS1_roll_quant=0.024_midivals=128_extendsus=True.h5")
         #"MAESTROv3_roll_quant=0.024_midivals=128_extendsus=True.h5")
     #SNAPSHOT_INPATH: Optional[str] = "out/model_snapshots/OnsetsAndVelocities_2023_12_11_20_20_10.595.torch"
     SNAPSHOT_INPATH: Optional[str] = None
@@ -541,5 +541,5 @@ if __name__ == "__main__":
     # Save the training losses to a CSV file
     loss_columns = ['Epoch', 'Step', 'Velocity_Loss', 'Onset_Loss'] if CONF.TRAINABLE_ONSETS else ['Epoch', 'Step', 'Velocity_Loss']
     df_losses = pd.DataFrame(training_losses, columns=loss_columns)
-    df_losses.to_csv(os.path.join(results_folder, 'pudoms_training_losses.csv'), index=False)
+    df_losses.to_csv(os.path.join(results_folder, 'pudoms1_training_losses.csv'), index=False)
 
