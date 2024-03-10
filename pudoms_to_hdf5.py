@@ -10,7 +10,7 @@ from ov_piano.data.midi import GeneralMidiParser, MidiToPianoRoll
 
 @dataclass
 class ConfDef:
-    INPATH: str = os.path.join("data", "PuDoMS1")
+    INPATH: str = os.path.join("data", "PuDoMS")
     OUTPUT_DIR: str = "data"
     TARGET_SR: int = 16_000
     STFT_WINSIZE: int = 2048
